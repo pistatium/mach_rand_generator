@@ -1,0 +1,72 @@
+<!doctype html>
+<meta charset='utf-8'>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.amber-yellow.min.css" />
+<script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+<script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+<style>
+    .mdl-textfield {
+        width: 90%;
+    }
+    #possible_input {
+        width: 90%;
+    }
+</style>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+
+    <div class="android-header mdl-layout__header mdl-layout__header--waterfall">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">
+                MachRandGenerator
+            </span>
+            <div class="android-header-spacer mdl-layout-spacer"></div>
+        </div>
+    </div>
+    <div class="android-content mdl-layout__content">
+        <a name="top"></a>
+        <div class="mdl-typography--text-center">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input id='possible_input' type='text' class="mdl-textfield__input" name='possible' value='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-@#$%&'>
+                <label class="mdl-textfield__label" for="possible">Possible chars</label>
+            </div>
+            <div id='result'>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function() {
+        var box_list = [4, 6, 8, 10, 12, 16, 32, 64, 128];
+        var main = function() {
+            init();
+            setInterval(set_random, 350);
+            generate();
+        };
+        var init = function() {
+            for (var i in box_list) {
+                $('#result').append('<input id="generated' + box_list[i] + '" readonly>');
+            };
+        };
+        var set_random = function() {
+            chars = generate();
+            var start = 0;
+            for (var i in box_list) {
+                var num = box_list[i];
+                $('#generated' + num).val(chars.slice(start, start + num));
+                start += num;
+            };
+        };
+        var generate = function() {
+            var key = new Uint32Array(1000);
+            var r = window.crypto.getRandomValues(key);
+            return r.reduce(get_char, '');
+        };
+        var get_char = function(p, i) {
+            var possible = $('#possible_input').val();
+            return p + possible.charAt(i % possible.length);
+        };
+        main();
+    });
+
+</script>
