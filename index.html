@@ -12,25 +12,41 @@
     #possible_input {
         width: 90%;
     }
+    #result {
+        text-align:center;
+        width: 90%;
+        margin: 20px auto;
+    }
+    #dummy {
+        width: 0px; 
+        height: 0px;
+        border: none;
+    }
+    .generated {
+        display: block;
+        width: 90%;
+        margin: 5px 10px 20px 10px;
+        font-size: 20px;
+    }
 </style>
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-
-    <div class="android-header mdl-layout__header mdl-layout__header--waterfall">
+    <div class="mdl-layout__header mdl-layout__header--waterfall">
         <div class="mdl-layout__header-row">
             <span class="mdl-layout-title">
                 MachRandGenerator
             </span>
-            <div class="android-header-spacer mdl-layout-spacer"></div>
+            <div class="mdl-layout-spacer"></div>
         </div>
     </div>
-    <div class="android-content mdl-layout__content">
+    <div class="mdl-layout__content">
         <a name="top"></a>
         <div class="mdl-typography--text-center">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                 <input id='possible_input' type='text' class="mdl-textfield__input" name='possible' value='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-@#$%&'>
                 <label class="mdl-textfield__label" for="possible">Possible chars</label>
             </div>
-            <div id='result'>
+            <input type='text' id='dummy'>
+            <div class="mdl-typography--text-center" id='result'>
             </div>
         </div>
     </div>
@@ -45,7 +61,12 @@
         };
         var init = function() {
             for (var i in box_list) {
-                $('#result').append('<input id="generated' + box_list[i] + '" readonly>');
+                var num = box_list[i];
+                $('#result').append(num + '<input id="generated' + num + '" class="generated">');
+                $('#generated' + num).on('focus', function() {
+                    console.log($(this).val());
+                    document.execCommand("copy");
+                });
             };
         };
         var set_random = function() {
