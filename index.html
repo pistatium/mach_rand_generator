@@ -1,10 +1,12 @@
 <!doctype html>
-<meta charset='utf-8'>
+<meta charset="utf-8">
+<title>MachRandGenerator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.amber-yellow.min.css" />
 <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
 <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
 <style>
     .mdl-textfield {
         width: 90%;
@@ -13,20 +15,18 @@
         width: 90%;
     }
     #result {
-        text-align:center;
         width: 90%;
-        margin: 20px auto;
-    }
-    #dummy {
-        width: 0px; 
-        height: 0px;
-        border: none;
     }
     .generated {
-        display: block;
-        width: 90%;
-        margin: 5px 10px 20px 10px;
-        font-size: 20px;
+        white-space: nowrap;
+    }
+    .left-box {
+        width: 300px;
+        overflow: hidden;
+        margin: 10px;
+    }
+    #template {
+        display: none;
     }
 </style>
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
@@ -36,57 +36,82 @@
                 MachRandGenerator
             </span>
             <div class="mdl-layout-spacer"></div>
+            <nav class="mdl-navigation">
+              <a class="mdl-navigation__link" href="http://kimihiro-n.appspot.com">Pistatium</a>
+              <a class="mdl-navigation__link" href="https://github.com/pistatium/mach_rand_generator">GitHub</a>
+            </nav>
         </div>
     </div>
     <div class="mdl-layout__content">
         <a name="top"></a>
         <div class="mdl-typography--text-center">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input id='possible_input' type='text' class="mdl-textfield__input" name='possible' value='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-@#$%&'>
+                <input id="possible_input" type="text" class="mdl-textfield__input" name="possible" value="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-@#$%&">
                 <label class="mdl-textfield__label" for="possible">Possible chars</label>
             </div>
-            <input type='text' id='dummy'>
-            <div class="mdl-typography--text-center" id='result'>
-            </div>
+            <ul class="mdl-list" id="result">
+            </ul>
         </div>
     </div>
+    <ul class="mdl-list" id="template">
+        <li class="mdl-list__item mdl-list__item--two-line">
+            <span class="left-box mdl-list__item-primary-content">
+                <span class="generated">twCBMcZ3$UrIuxm8UhV</span>
+                <span class="label mdl-list__item-sub-title">32 Chars</span>
+            </span>
+            <span class="mdl-list__item-secondary-action">
+                <button class="copy mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">COPY</button>
+            </span>
+          </li>
+    </ul>
 </div>
 <script>
     $(function() {
-        var box_list = [4, 6, 8, 10, 12, 16, 32, 64, 128];
+        var INTERVAL = 150;
+        var box_list = [6, 8, 10, 12, 16, 32, 64, 128];
+
         var main = function() {
             init();
-            setInterval(set_random, 350);
-            generate();
+            set_random();
+            setInterval(set_random, INTERVAL);
         };
+
         var init = function() {
             for (var i in box_list) {
                 var num = box_list[i];
-                $('#result').append(num + '<input id="generated' + num + '" class="generated">');
-                $('#generated' + num).on('focus', function() {
-                    console.log($(this).val());
-                    document.execCommand("copy");
-                });
+                var elem = $("#template").clone().show();
+                elem.find(".generated").attr("id", "generated" + num);
+                elem.find(".copy").attr("id", "copy" + num);
+                elem.find(".label").text(num + " Chars");
+                elem.find(".copy").attr("data-clipboard-text", "xxx");
+                $("#result").append($(elem));
             };
+            new Clipboard(".copy");
         };
+
         var set_random = function() {
             chars = generate();
             var start = 0;
             for (var i in box_list) {
                 var num = box_list[i];
-                $('#generated' + num).val(chars.slice(start, start + num));
+                var generated = chars.slice(start, start + num);
+                $("#generated" + num).text(generated);
+                $("#copy" + num).attr("data-clipboard-text", generated);
                 start += num;
             };
         };
+
         var generate = function() {
             var key = new Uint32Array(1000);
             var r = window.crypto.getRandomValues(key);
-            return r.reduce(get_char, '');
+            return r.reduce(get_char, "");
         };
+
         var get_char = function(p, i) {
-            var possible = $('#possible_input').val();
+            var possible = $("#possible_input").val();
             return p + possible.charAt(i % possible.length);
         };
+
         main();
     });
 
